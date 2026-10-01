@@ -1,9 +1,9 @@
 # S4D-TAM Benchmark
 
-[![CI](https://github.com/MatPomGit/s4d-tam/actions/workflows/ci.yml/badge.svg)](https://github.com/MatPomGit/s4d-tam/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/MatPomGit/s4d-tam/actions/workflows/codeql.yml/badge.svg)](https://github.com/MatPomGit/s4d-tam/actions/workflows/codeql.yml)
-[![Documentation](https://github.com/MatPomGit/s4d-tam/actions/workflows/docs.yml/badge.svg)](https://matpomgit.github.io/s4d-tam/)
-[![Research governance](https://github.com/MatPomGit/s4d-tam/actions/workflows/research-governance.yml/badge.svg)](https://github.com/MatPomGit/s4d-tam/actions/workflows/research-governance.yml)
+[![CI](https://github.com/MatPomGit/arc-s4d-tam/actions/workflows/ci.yml/badge.svg)](https://github.com/MatPomGit/arc-s4d-tam/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/MatPomGit/arc-s4d-tam/actions/workflows/codeql.yml/badge.svg)](https://github.com/MatPomGit/arc-s4d-tam/actions/workflows/codeql.yml)
+[![Documentation](https://github.com/MatPomGit/arc-s4d-tam/actions/workflows/docs.yml/badge.svg)](https://matpomgit.github.io/s4d-tam/)
+[![Research governance](https://github.com/MatPomGit/arc-s4d-tam/actions/workflows/research-governance.yml/badge.svg)](https://github.com/MatPomGit/arc-s4d-tam/actions/workflows/research-governance.yml)
 
 Reproducible benchmark and transparent Python reference implementation for **S4D-TAM: Semantic 4D Token Attention Map for Autonomous Navigation of Unmanned Aerial Vehicles in GNSS-Degraded Environments**.
 
@@ -42,8 +42,8 @@ Start with:
 ## Quick start
 
 ```bash
-git clone https://github.com/MatPomGit/s4d-tam.git
-cd s4d-tam
+git clone https://github.com/MatPomGit/arc-s4d-tam.git
+cd arc-s4d-tam
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
