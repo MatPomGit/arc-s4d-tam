@@ -14,6 +14,7 @@ S4D-TAM is under active research development. This page separates what is execut
 | S4D-TAM reference | Executable research reference | token lifecycle, association, attention-related components, forecasting, reference-map/topology support, telemetry and planning modules exist |
 | Learned S4D-TAM model | In development | the current implementation is not the final trained hierarchical transformer described by the research concept |
 | Scientific comparison | Protocol ready, evidence pending | metrics, preregistration, SIL/HIL/flight protocols and reporting infrastructure exist; confirmatory study is not yet complete |
+| Research governance | Operational | machine-readable project state, evidence/claim registries, data-management/statistical policies, decision/deviation records, risk register and automated governance audit |
 | Flight readiness | Not validated | no flight certification or operational safety claim is made |
 
 ## Implemented S4D-TAM building blocks
@@ -41,7 +42,8 @@ The regular CI pipeline is intentionally scoped to software health during active
 - unit and regression tests;
 - the synthetic smoke benchmark on `main`;
 - documentation build consistency;
-- CodeQL security analysis according to its own schedule and trigger rules.
+- CodeQL security analysis according to its own schedule and trigger rules;
+- static research-governance contracts, registry structure and project-state consistency.
 
 Code-style findings from Ruff are currently advisory. They remain visible without being treated as evidence that the numerical benchmark is broken.
 
@@ -72,4 +74,4 @@ flowchart TD
     H --> I[Independent reproduction]
 ```
 
-For task-level progress, see the [Roadmap](roadmap.md). For the experimental rules that turn implementation results into scientific evidence, see [Methodology](methodology.md), [Preregistration](preregistration.md) and [Reproducibility](reproducibility.md).
+For task-level progress, see the [Roadmap](roadmap.md). For the experimental rules that turn implementation results into scientific evidence, see [Methodology](methodology.md), [Preregistration](preregistration.md) and [Reproducibility](reproducibility.md). Research-governance controls are described in [Research workflow](research_workflow.md) and summarized by the [research-quality audit](research-quality-audit-2026-10-01.md).
