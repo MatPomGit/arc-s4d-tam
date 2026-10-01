@@ -110,6 +110,18 @@ nav:
       - HIL protocol: hil-protocol.md
       - Real-flight protocol: real-flight-protocol.md
       - Token event logging: token-event-logging.md
+  - Research governance:
+      - Research workflow: research_workflow.md
+      - Data management plan: data_management_plan.md
+      - Statistical reporting: statistical_reporting_policy.md
+      - Experiment identifiers: experiment_naming_and_ids.md
+      - Project assumptions: project_assumptions.md
+      - Terminology glossary: terminology_glossary.md
+      - Authorship and contributions: authorship_contributions.md
+      - Literature review policy: literature_review_policy.md
+      - Publication release checklist: publication_release_checklist.md
+      - Responsible use and safety: responsible_use_and_safety_governance.md
+      - Research-quality audit 2026-10-01: research-quality-audit-2026-10-01.md
   - Reproduction and compliance:
       - Independent reproduction package: independent-reproduction-package.md
       - Compliance report: compliance-report.md
