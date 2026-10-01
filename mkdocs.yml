@@ -1,8 +1,8 @@
 site_name: S4D-TAM Benchmark
 site_description: Reproducible benchmark and reference implementation for Semantic 4D Token Attention Map autonomous UAV navigation.
 site_url: https://matpomgit.github.io/s4d-tam/
-repo_url: https://github.com/MatPomGit/s4d-tam
-repo_name: MatPomGit/s4d-tam
+repo_url: https://github.com/MatPomGit/arc-s4d-tam
+repo_name: MatPomGit/arc-s4d-tam
 edit_uri: edit/main/docs/
 
 copyright: Copyright &copy; S4D-TAM contributors
