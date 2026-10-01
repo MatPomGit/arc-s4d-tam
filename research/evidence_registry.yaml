@@ -1,0 +1,18 @@
+schema_version: 1
+updated: 2026-10-01
+description: >
+  Registry of immutable evidence bundles used for reportable scientific results.
+  Specifications, protocol documents and pinned baseline revisions are not evidence bundles.
+required_fields:
+  - evidence_id
+  - created_at
+  - source_commit
+  - study_id
+  - config_path
+  - input_manifest_hashes
+  - environment_provenance
+  - artifact_hashes
+  - analysis_commit
+  - evidence_class
+  - status
+evidence: []

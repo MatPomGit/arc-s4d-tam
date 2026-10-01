@@ -1,0 +1,6 @@
+schema_version: 1
+updated: 2026-10-01
+description: >
+  Claim-to-evidence ledger. Add entries only when a concrete manuscript or project claim
+  can be linked to identifiable evidence. Do not pre-populate with hypothetical results.
+claims: []

@@ -1,0 +1,6 @@
+schema_version: 1
+updated: 2026-10-01
+description: >
+  Reproducible literature-search log. Record database, exact query, date, filters,
+  screening counts and inclusion rationale for publication-facing reviews.
+searches: []

@@ -15,8 +15,8 @@ The benchmark is currently designed for research and numerical validation. The s
 === "Linux / macOS"
 
     ```bash
-    git clone https://github.com/MatPomGit/s4d-tam.git
-    cd s4d-tam
+    git clone https://github.com/MatPomGit/arc-s4d-tam.git
+    cd arc-s4d-tam
     python -m venv .venv
     source .venv/bin/activate
     python -m pip install --upgrade pip
@@ -26,8 +26,8 @@ The benchmark is currently designed for research and numerical validation. The s
 === "Windows PowerShell"
 
     ```powershell
-    git clone https://github.com/MatPomGit/s4d-tam.git
-    cd s4d-tam
+    git clone https://github.com/MatPomGit/arc-s4d-tam.git
+    cd arc-s4d-tam
     py -m venv .venv
     .\.venv\Scripts\Activate.ps1
     python -m pip install --upgrade pip

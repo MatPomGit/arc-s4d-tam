@@ -1,0 +1,117 @@
+schema_version: 1
+project: S4D-TAM
+updated: 2026-10-01
+research_phase: benchmark_and_evidence_readiness
+canonical_sources:
+  implementation: src/s4dtam_benchmark
+  scientific_protocol:
+    - docs/comparison-protocol.md
+    - docs/preregistration.md
+    - docs/methodology.md
+    - docs/reproducibility.md
+  execution_gates:
+    - docs/readiness.md
+    - configs/readiness/dataset_baseline_matrix.yaml
+    - configs/reproduction/confirmatory_freeze.template.yaml
+  manuscript: manuscript
+evidence_state:
+  synthetic_smoke: available_for_software_validation_only
+  public_dataset_conversion: partial
+  external_baseline_reproduction: pending
+  learned_s4dtam_model: in_development
+  confirmatory_h1_h7: blocked_by_confirmatory_freeze
+  sil_validation: pending
+  hil_validation: pending
+  controlled_real_flight: not_validated
+  independent_reproduction: pending
+current_blockers:
+  - id: DATASET_FREEZE
+    status: pending
+    reason: Final dataset manifests, source versions and checksums must be frozen.
+  - id: BASELINE_EVIDENCE
+    status: pending
+    reason: Pinned baseline specifications are not equivalent to executed reproduction evidence.
+  - id: MODEL_ARTIFACTS
+    status: pending
+    reason: Final trained full and H1-H7 artifacts must be frozen before confirmatory analysis.
+  - id: CONFIRMATORY_FREEZE
+    status: blocked
+    reason: Confirmatory freeze remains intentionally incomplete until all evidence inputs exist.
+  - id: FLIGHT_VALIDATION
+    status: not_authorized_by_evidence
+    reason: Software and simulation readiness do not establish flight safety or certification.
+next_actions:
+  - order: 1
+    id: freeze-datasets
+    action: Freeze dataset manifests and checksums for the intended confirmatory cohorts.
+    procedure: docs/data_management_plan.md
+    prerequisites:
+      - verified source dataset versions
+      - immutable sequence lists
+    expected_outputs:
+      - versioned manifests
+      - SHA-256 checksums
+      - provenance records
+    done_when: Every confirmatory input is identified by immutable manifest and checksum.
+  - order: 2
+    id: reproduce-baselines
+    action: Execute at least one complete external baseline path on a frozen compatible cohort.
+    procedure: docs/comparison-protocol.md
+    prerequisites:
+      - freeze-datasets
+    expected_outputs:
+      - normalized AlgorithmResult artifacts
+      - execution provenance
+      - failure records
+    done_when: Baseline output is reproducible from pinned source/container plus frozen input.
+  - order: 3
+    id: freeze-model-artifacts
+    action: Freeze the full model and all preregistered H1-H7 ablation artifacts.
+    procedure: docs/preregistration.md
+    prerequisites:
+      - frozen training and calibration inputs
+    expected_outputs:
+      - immutable artifact identifiers
+      - checksums
+      - training provenance
+    done_when: Full and H1-H7 artifacts pass confirmatory-freeze validation without invented metadata.
+  - order: 4
+    id: run-confirmatory-offline
+    action: Run the confirmatory offline benchmark exactly under the frozen protocol.
+    procedure: docs/reproducibility.md
+    prerequisites:
+      - freeze-datasets
+      - reproduce-baselines
+      - freeze-model-artifacts
+    expected_outputs:
+      - evidence bundle
+      - statistical report
+      - exclusion and failure log
+    done_when: Primary analyses can be regenerated from registered inputs without manual transcription.
+  - order: 5
+    id: validate-sil
+    action: Execute the SIL protocol after offline evidence is frozen.
+    procedure: docs/sil-protocol.md
+    prerequisites:
+      - run-confirmatory-offline
+    expected_outputs:
+      - SIL evidence bundle
+    done_when: SIL acceptance criteria and limitations are documented from actual runs.
+  - order: 6
+    id: validate-hil
+    action: Execute the HIL protocol after SIL readiness is demonstrated.
+    procedure: docs/hil-protocol.md
+    prerequisites:
+      - validate-sil
+    expected_outputs:
+      - HIL evidence bundle
+    done_when: HIL acceptance criteria and limitations are documented from actual runs.
+  - order: 7
+    id: controlled-flight
+    action: Consider controlled real-flight validation only after independent safety and operational gates are satisfied.
+    procedure: docs/real-flight-protocol.md
+    prerequisites:
+      - validate-hil
+    expected_outputs:
+      - controlled-flight evidence or a documented no-go decision
+    done_when: Evidence status is updated without implying certification beyond what was actually demonstrated.

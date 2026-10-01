@@ -46,6 +46,8 @@ of Unmanned Aerial Vehicles in GNSS-Degraded Environments**.
 - `paper/`: historical material, not the current publication source.
 - `docs/` and `mkdocs.yml`: documentation sources and site configuration.
 - `tools/`: research-support and release utilities.
+- `PROJECT_STATE.yaml`: machine-readable evidence phase, blockers and ordered next actions.
+- `research/`: evidence/claim registries, literature log, risks, decisions, deviations and negative-result records.
 
 The executable S4DTAMReference is not the final trained hierarchical transformer.
 Synthetic smoke results validate software execution, not scientific superiority
@@ -97,6 +99,9 @@ Every agent must follow these rules:
   `configs/reproduction/confirmatory_freeze.template.yaml`.
 - Validation stages: `docs/sil-protocol.md`, `docs/hil-protocol.md`,
   `docs/real-flight-protocol.md`.
+- Research governance: `PROJECT_STATE.yaml`, `docs/research_workflow.md`,
+  `docs/data_management_plan.md`, `docs/statistical_reporting_policy.md`,
+  `research/evidence_registry.yaml`, `research/claim_ledger.yaml`.
 - Contribution and safety rules: `CONTRIBUTING.md`, `SECURITY.md`.
 - Build/check commands: `pyproject.toml`, `.github/workflows/ci.yml`,
   `.github/workflows/docs.yml`, `.github/workflows/manuscript.yml`.
@@ -106,6 +111,7 @@ Executable CI is authoritative for actual checks: do not weaken blocking Ruff
 or Mypy steps because older README/status prose describes lint as advisory.
 MkDocs output is generated from `docs/` and `mkdocs.yml`; edit sources,
 not generated site output. Preserve frozen protocols and record deviations.
+Before promoting any evidence class, read `PROJECT_STATE.yaml`; do not infer readiness from prose or CI status alone.
 
 ## 4. Scientific integrity and research rules
 

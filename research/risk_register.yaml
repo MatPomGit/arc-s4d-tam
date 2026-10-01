@@ -1,0 +1,45 @@
+schema_version: 1
+updated: 2026-10-01
+risks:
+  - id: R01
+    category: scientific_validity
+    risk: Holdout leakage or tuning after observing confirmatory outcomes.
+    likelihood: medium
+    impact: critical
+    mitigation: Separate train/calibration/test; freeze inputs and model artifacts; log deviations.
+    status: active
+  - id: R02
+    category: comparison_fairness
+    risk: Baselines receive unequal sensing, calibration, map priors or compute budgets.
+    likelihood: medium
+    impact: high
+    mitigation: Use the compatibility matrix and disclose every unequal sensing assumption.
+    status: active
+  - id: R03
+    category: reproducibility
+    risk: A pinned revision is mistaken for reproduced baseline evidence.
+    likelihood: medium
+    impact: high
+    mitigation: Require executed normalized result artifacts with provenance and checksums.
+    status: active
+  - id: R04
+    category: statistics
+    risk: Frame-level pseudoreplication inflates effective sample size.
+    likelihood: medium
+    impact: high
+    mitigation: Use mission/sequence as the inferential unit and preserve paired design.
+    status: active
+  - id: R05
+    category: reporting
+    risk: Software smoke tests are over-interpreted as scientific or flight validation.
+    likelihood: medium
+    impact: high
+    mitigation: Label evidence classes and keep project-readiness states explicit.
+    status: active
+  - id: R06
+    category: dual_use
+    risk: Research artifacts are repurposed for targeting, weaponization or unsafe autonomous operation.
+    likelihood: low
+    impact: critical
+    mitigation: Maintain dual-use review, exclude weapon-specific procedures, and preserve independent safety controls for physical validation.
+    status: active

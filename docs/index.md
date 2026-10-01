@@ -10,7 +10,7 @@ The project provides one auditable evaluation path for S4D-TAM and external navi
 
 [:material-rocket-launch: Get started](getting-started.md){ .md-button .md-button--primary }
 [:material-list-status: Project status](project-status.md){ .md-button }
-[:fontawesome-brands-github: GitHub repository](https://github.com/MatPomGit/s4d-tam){ .md-button }
+[:fontawesome-brands-github: GitHub repository](https://github.com/MatPomGit/arc-s4d-tam){ .md-button }
 
 </div>
 
