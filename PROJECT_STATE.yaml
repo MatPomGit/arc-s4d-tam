@@ -12,6 +12,7 @@ canonical_sources:
   execution_gates:
     - docs/readiness.md
     - configs/readiness/dataset_baseline_matrix.yaml
+    - configs/readiness/dataset_freeze_plan.yaml
     - configs/reproduction/confirmatory_freeze.template.yaml
   manuscript: manuscript
 evidence_state:
@@ -26,8 +27,9 @@ evidence_state:
   independent_reproduction: pending
 current_blockers:
   - id: DATASET_FREEZE
-    status: pending
-    reason: Final dataset manifests, source versions and checksums must be frozen.
+    status: pending_real_dataset_acquisition
+    source: configs/readiness/dataset_freeze_plan.yaml
+    reason: Final real-dataset manifests, source versions, immutable sequence lists and checksums must be frozen; synthetic fixtures do not satisfy this gate.
   - id: BASELINE_EVIDENCE
     status: pending
     reason: Pinned baseline specifications are not equivalent to executed reproduction evidence.
@@ -43,8 +45,8 @@ current_blockers:
 next_actions:
   - order: 1
     id: freeze-datasets
-    action: Freeze dataset manifests and checksums for the intended confirmatory cohorts.
-    procedure: docs/data_management_plan.md
+    action: Freeze the first real TartanAir cohort using the existing convert/preflight/freeze path, then register immutable provenance before baseline reproduction.
+    procedure: configs/readiness/dataset_freeze_plan.yaml
     prerequisites:
       - verified source dataset versions
       - immutable sequence lists
