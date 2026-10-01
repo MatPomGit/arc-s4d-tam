@@ -3,6 +3,7 @@
 [![CI](https://github.com/MatPomGit/s4d-tam/actions/workflows/ci.yml/badge.svg)](https://github.com/MatPomGit/s4d-tam/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/MatPomGit/s4d-tam/actions/workflows/codeql.yml/badge.svg)](https://github.com/MatPomGit/s4d-tam/actions/workflows/codeql.yml)
 [![Documentation](https://github.com/MatPomGit/s4d-tam/actions/workflows/docs.yml/badge.svg)](https://matpomgit.github.io/s4d-tam/)
+[![Research governance](https://github.com/MatPomGit/s4d-tam/actions/workflows/research-governance.yml/badge.svg)](https://github.com/MatPomGit/s4d-tam/actions/workflows/research-governance.yml)
 
 Reproducible benchmark and transparent Python reference implementation for **S4D-TAM: Semantic 4D Token Attention Map for Autonomous Navigation of Unmanned Aerial Vehicles in GNSS-Degraded Environments**.
 
@@ -35,7 +36,8 @@ Start with:
 - [Methodology](https://matpomgit.github.io/s4d-tam/methodology/) and [Comparison protocol](docs/comparison-protocol.md) for the two-level scientific evaluation;
 - [Dataset and baseline readiness](docs/readiness.md) for sensor-compatible comparison cells and execution gates;
 - [Modules](docs/modules.md) for implemented reference components and planned research backends;
-- [Datasets](https://matpomgit.github.io/s4d-tam/datasets/) and [Metrics](https://matpomgit.github.io/s4d-tam/metrics/) for experiment design.
+- [Datasets](https://matpomgit.github.io/s4d-tam/datasets/) and [Metrics](https://matpomgit.github.io/s4d-tam/metrics/) for experiment design;
+- [Research workflow](docs/research_workflow.md), [Data management plan](docs/data_management_plan.md) and [Research-quality audit](docs/research-quality-audit-2026-10-01.md) for governance and traceability.
 
 ## Quick start
 
@@ -112,6 +114,7 @@ configs/                  experiment, dataset, readiness and algorithm configura
 docs/                     MkDocs documentation and validation protocols
 manuscript/               canonical modular LaTeX article and publication path
 paper/                    historical PDF, DOCX, XML and earlier LaTeX drafts
+research/                 claim/evidence registries, risks, deviations and decisions
 src/s4dtam_benchmark/     benchmark core, algorithms, adapters and reporting
 tests/                    numerical, contract and regression tests
 tools/                    release and research-support utilities
@@ -121,7 +124,7 @@ outputs/                  generated benchmark results, ignored by Git
 
 ## Development and CI
 
-The active-development CI verifies installation, syntax and unit/regression tests on Python 3.10 and 3.12. The smoke benchmark runs on `main`. Ruff findings are currently advisory so that accumulated style debt does not mask numerical failures. Documentation is built with MkDocs in strict mode and deployed through GitHub Pages.
+The active-development CI verifies installation, syntax and unit/regression tests on Python 3.10 and 3.12. The smoke benchmark runs on `main`. Ruff findings are currently advisory so that accumulated style debt does not mask numerical failures. Documentation is built with MkDocs in strict mode and deployed through GitHub Pages. A separate research-governance workflow validates the machine-readable project state, evidence/claim registries and required research-quality artifacts.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before modifying scientific contracts, metrics, dataset registration or experiment protocols.
 
