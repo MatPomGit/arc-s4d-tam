@@ -1,0 +1,55 @@
+schema_version: 1
+gate_id: DATASET_FREEZE
+status: pending_real_dataset_acquisition
+updated: 2026-10-01
+source_matrix: configs/readiness/dataset_baseline_matrix.yaml
+purpose: "Operational ordering for freezing the first real confirmatory-compatible dataset cohort without confusing tooling readiness with dataset evidence."
+
+priority_path:
+  dataset: tartanair
+  rationale: "Repository already provides conversion, preflight and freeze tooling for the TartanAir path; it is the shortest currently documented route to a real frozen cohort."
+  required_steps:
+    - id: pin_release
+      status: pending
+      evidence: null
+      done_when: "Exact upstream TartanAir release/source identity and redistribution constraints are recorded."
+    - id: select_sequences
+      status: pending
+      evidence: null
+      done_when: "Immutable sequence list is selected prospectively for the intended benchmark cohort."
+    - id: acquire_real_inputs
+      status: pending
+      evidence: null
+      done_when: "Selected real upstream files are acquired outside Git and source integrity is checked."
+    - id: convert
+      status: pending
+      command_family: convert-tartanair
+      evidence: null
+    - id: preflight
+      status: pending
+      command_family: preflight-tartanair
+      evidence: null
+      done_when: "Sampling, calibration, file completeness and converter assumptions pass preflight."
+    - id: freeze
+      status: pending
+      command_family: freeze-tartanair
+      evidence: null
+      done_when: "files.sha256, immutable sequence list and freeze.json exist and verify."
+    - id: register_provenance
+      status: pending
+      evidence: null
+      done_when: "Frozen cohort identity is registered for later baseline/model evidence bundles."
+
+secondary_paths:
+  blackbird:
+    status: pending_trajectory_and_sync_validation
+  marsim:
+    status: pending_simulator_pin_and_topic_freeze
+  aeroverse:
+    status: pending_release_and_license_verification
+
+hard_rules:
+  - "Synthetic manifests validate plumbing only and cannot satisfy DATASET_FREEZE."
+  - "Do not commit upstream dataset payloads unless redistribution terms explicitly permit it."
+  - "Do not substitute a newer mirror/release after freeze without creating a new manifest/version."
+  - "Final holdout inputs must not drive model or threshold tuning."
