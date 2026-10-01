@@ -115,3 +115,25 @@ next_actions:
     expected_outputs:
       - controlled-flight evidence or a documented no-go decision
     done_when: Evidence status is updated without implying certification beyond what was actually demonstrated.
+
+portfolio_control:
+  schema_version: 1
+  manager: "ChatGPT Project: Publikacje na GitHubie"
+  last_reviewed: 2026-10-01
+  overall_stage: benchmark_and_evidence_readiness
+  health: blocked_by_dataset_baseline_and_model_freeze
+  primary_next_action: freeze-datasets
+  publication_count:
+    core: 1
+  papers:
+    - id: P01
+      label: s4d_tam
+      stage: writing_pre_results
+      target_venue: Journal of Field Robotics
+      next_gate: frozen_offline_confirmatory_benchmark
+  update_triggers:
+    - dataset_freeze_change
+    - baseline_reproduction_change
+    - model_artifact_change
+    - validation_stage_change
+    - submission_status_change
