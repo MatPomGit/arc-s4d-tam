@@ -146,3 +146,6 @@ portfolio_dashboard:
   source_of_truth: "PROJECT_STATE.yaml and the repository sources referenced from it"
   update_rule: "Update repository state first; refresh the central dashboard after material changes to phase, blockers, evidence, next actions, manuscript stage, or submission status."
   last_synced: 2026-10-01
+
+research_quality:
+  manifest: research/quality_manifest.yaml
