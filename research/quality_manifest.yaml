@@ -1,0 +1,29 @@
+schema_version: 1
+project: arc-s4d-tam
+updated: 2026-10-01
+status: active
+purpose: "Machine-readable index of research-quality controls for the S4D-TAM benchmark and publication programme."
+
+artifacts:
+  project_state: {path: PROJECT_STATE.yaml, status: active}
+  evidence_registry: {path: research/evidence_registry.yaml, status: active}
+  claim_ledger: {path: research/claim_ledger.yaml, status: active}
+  risk_register: {path: research/risk_register.yaml, status: active}
+  decisions: {path: research/decisions, status: active}
+  deviations: {path: research/deviations, status: active}
+  literature_search_log: {path: research/literature_search_log.yaml, status: active}
+  negative_results: {path: research/negative_results.md, status: active}
+  data_management: {path: docs/data_management_plan.md, status: active}
+  reproducibility: {path: docs/reproducibility.md, status: active}
+  statistical_reporting: {path: docs/statistical_reporting_policy.md, status: active}
+  publication_release: {path: docs/publication_release_checklist.md, status: active}
+  assumptions: {path: docs/project_assumptions.md, status: active}
+  comparison_protocol: {path: docs/comparison-protocol.md, status: active}
+  dataset_freeze: {path: configs/readiness/dataset_freeze_plan.yaml, status: active}
+
+quality_rules:
+  - "Synthetic fixtures validate plumbing only and never substitute for real benchmark evidence."
+  - "Every reportable benchmark result resolves to immutable dataset, model/baseline, config, environment and output provenance."
+  - "Final holdout inputs do not drive tuning."
+  - "Failures, timeouts and null/negative outcomes remain part of the evidence record."
+  - "Publication tables and figures are generated from registered evidence artifacts."
