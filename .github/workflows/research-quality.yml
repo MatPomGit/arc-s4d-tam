@@ -1,0 +1,81 @@
+name: Research quality manifest
+
+on:
+  push:
+    paths:
+      - "research/**"
+      - "docs/**"
+      - "PROJECT_STATE.yaml"
+      - "AGENTS.md"
+      - ".github/workflows/research-quality.yml"
+  pull_request:
+    paths:
+      - "research/**"
+      - "docs/**"
+      - "PROJECT_STATE.yaml"
+      - "AGENTS.md"
+      - ".github/workflows/research-quality.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality-manifest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate research quality artifact graph
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          manifest_path = Path("research/quality_manifest.yaml")
+          if not manifest_path.is_file():
+              raise SystemExit("Missing research/quality_manifest.yaml")
+
+          text = manifest_path.read_text(encoding="utf-8")
+          required = {
+              "evidence_registry",
+              "claim_ledger",
+              "risk_register",
+              "literature_search_log",
+              "negative_results",
+              "reproducibility",
+              "publication_release",
+          }
+          missing_keys = [
+              key for key in sorted(required)
+              if not re.search(rf"^  {re.escape(key)}:", text, re.MULTILINE)
+          ]
+          if missing_keys:
+              raise SystemExit(
+                  "Quality manifest missing required artifact keys: "
+                  + ", ".join(missing_keys)
+              )
+
+          paths = re.findall(r"path:\s*([^,}\n]+)", text)
+          if len(paths) < 7:
+              raise SystemExit("Quality manifest contains too few artifact paths")
+
+          missing_paths = []
+          for raw in paths:
+              path = raw.strip().strip('"').strip("'")
+              if not Path(path).exists():
+                  missing_paths.append(path)
+
+          if missing_paths:
+              raise SystemExit(
+                  "Quality manifest references missing paths: "
+                  + ", ".join(sorted(set(missing_paths)))
+              )
+
+          if len(paths) != len(set(paths)):
+              raise SystemExit("Quality manifest contains duplicate artifact paths")
+
+          print(f"Validated {len(paths)} research-quality artifact references.")
+          PY
