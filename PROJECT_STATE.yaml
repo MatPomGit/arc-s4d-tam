@@ -137,3 +137,10 @@ portfolio_control:
     - model_artifact_change
     - validation_stage_change
     - submission_status_change
+
+portfolio_dashboard:
+  url: "https://docs.google.com/spreadsheets/d/1wpRTxGKL-0tPHn-dCzZLkTDNBkF4q2juCe5S9-YUZsM/edit"
+  role: "Central derivative view for cross-repository publication and research management."
+  source_of_truth: "PROJECT_STATE.yaml and the repository sources referenced from it"
+  update_rule: "Update repository state first; refresh the central dashboard after material changes to phase, blockers, evidence, next actions, manuscript stage, or submission status."
+  last_synced: 2026-10-01
