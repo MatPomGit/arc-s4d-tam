@@ -47,6 +47,7 @@ jobs:
       - name: Upload manuscript PDF
         uses: actions/upload-artifact@v4
         with:
+          retention-days: 7
           name: s4d-tam-manuscript
           path: manuscript/main.pdf
           if-no-files-found: error
