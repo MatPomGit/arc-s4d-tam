@@ -13,6 +13,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: s4d-manuscript-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   latex:
     runs-on: ubuntu-latest
@@ -47,7 +51,7 @@ jobs:
       - name: Upload manuscript PDF
         uses: actions/upload-artifact@v4
         with:
-          retention-days: 7
+          retention-days: 1
           name: s4d-tam-manuscript
           path: manuscript/main.pdf
           if-no-files-found: error
