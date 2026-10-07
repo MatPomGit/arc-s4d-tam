@@ -7,8 +7,6 @@ on:
       - "src/**"
       - "pyproject.toml"
       - ".github/workflows/codeql.yml"
-  schedule:
-    - cron: "17 4 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -30,11 +28,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: python
-
       - name: Analyze
         uses: github/codeql-action/analyze@v4
