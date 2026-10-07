@@ -20,9 +20,13 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: s4d-research-quality-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality-manifest:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, ARM64]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
