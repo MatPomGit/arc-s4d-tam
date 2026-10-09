@@ -1,8 +1,24 @@
 name: CI
 
 on:
-  # Heavy build reserved for approved local Andromeda execution or
-  # manually authorized one-off when provider budget is available.
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "configs/**"
+      - "tools/**"
+      - "pyproject.toml"
+      - ".github/workflows/ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "configs/**"
+      - "tools/**"
+      - "pyproject.toml"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -103,7 +119,7 @@ jobs:
           name: smoke-results
           path: outputs/smoke/
           if-no-files-found: warn
-          retention-days: 7
+          retention-days: 1
 
   release-integrity:
     name: Release integrity
