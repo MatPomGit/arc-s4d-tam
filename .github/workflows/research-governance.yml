@@ -13,15 +13,29 @@ on:
       - "tools/audit_research_governance.py"
       - "tests/test_research_governance.py"
       - ".github/workflows/research-governance.yml"
+  pull_request:
+    paths:
+      - "PROJECT_STATE.yaml"
+      - "TODO.md"
+      - "research/**"
+      - "docs/**"
+      - "configs/reproduction/**"
+      - "configs/readiness/**"
+      - "tools/audit_research_governance.py"
+      - "tests/test_research_governance.py"
+      - ".github/workflows/research-governance.yml"
   workflow_dispatch:
-
 
 permissions:
   contents: read
 
+concurrency:
+  group: s4d-governance-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   audit:
-    runs-on: [self-hosted, Linux, ARM64, homeserver]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
