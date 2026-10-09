@@ -2,13 +2,7 @@ name: Research quality manifest
 
 on:
   push:
-    paths:
-      - "research/**"
-      - "docs/**"
-      - "PROJECT_STATE.yaml"
-      - "AGENTS.md"
-      - ".github/workflows/research-quality.yml"
-  pull_request:
+    branches: [main]
     paths:
       - "research/**"
       - "docs/**"
@@ -16,6 +10,7 @@ on:
       - "AGENTS.md"
       - ".github/workflows/research-quality.yml"
   workflow_dispatch:
+
 
 permissions:
   contents: read
@@ -26,7 +21,7 @@ concurrency:
 
 jobs:
   quality-manifest:
-    runs-on: [self-hosted, Linux, ARM64]
+    runs-on: [self-hosted, Linux, ARM64, homeserver]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
