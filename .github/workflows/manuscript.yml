@@ -1,14 +1,9 @@
 name: Manuscript
 
 on:
-  push:
-    paths:
-      - "manuscript/**"
-      - ".github/workflows/manuscript.yml"
-  pull_request:
-    paths:
-      - "manuscript/**"
-      - ".github/workflows/manuscript.yml"
+  # Heavy build reserved for approved local Andromeda execution or
+  # manually authorized one-off when provider budget is available.
+  workflow_dispatch:
 
 permissions:
   contents: read
