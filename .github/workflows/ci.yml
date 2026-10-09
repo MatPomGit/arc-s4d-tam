@@ -1,24 +1,8 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "src/**"
-      - "tests/**"
-      - "configs/**"
-      - "tools/**"
-      - "pyproject.toml"
-      - ".github/workflows/ci.yml"
-  push:
-    branches: [main]
-    paths:
-      - "src/**"
-      - "tests/**"
-      - "configs/**"
-      - "tools/**"
-      - "pyproject.toml"
-      - ".github/workflows/ci.yml"
+  # Heavy build reserved for approved local Andromeda execution or
+  # manually authorized one-off when provider budget is available.
   workflow_dispatch:
 
 permissions:
