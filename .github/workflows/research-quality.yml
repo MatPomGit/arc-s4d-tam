@@ -2,6 +2,7 @@ name: Research quality manifest
 
 on:
   push:
+    branches: [main]
     paths:
       - "research/**"
       - "docs/**"
@@ -26,7 +27,7 @@ concurrency:
 
 jobs:
   quality-manifest:
-    runs-on: [self-hosted, Linux, ARM64]
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
