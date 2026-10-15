@@ -554,3 +554,12 @@ repository.
 - Automatyczne wyjątki: dokumentacja i CodeQL tylko po `push` na `main`, z wąskim filtrem `paths`. Każdy nowy wyjątek wymaga uzasadnienia kosztowego.
 - Każdy job musi mieć `github.ref == 'refs/heads/main'`; dotychczasowe warunki zadań nadal obowiązują. Zakaz `pull_request_target`, `workflow_run`, tagów, `repository_dispatch` oraz automatyzacji na innych gałęziach.
 - Testy PR wykonywać lokalnie; nie deklarować nieuruchomionych analiz jako potwierdzonych. W formularzu GitHub zawsze wybierać main, gdyż historyczne YAML na innych gałęziach mogą nie być zabezpieczone.
+
+## GitHub Actions execution policy (mandatory for AI agents)
+
+1. **Manual by default.** Use `workflow_dispatch` for costly CI, model training, publications, Android builds, manuscript compilation, GPU jobs, benchmarks and research experiments. Do not add automatic runs unless explicitly justified.
+2. Automatic workflows, where necessary, may run only on `push` to `main`, with `branches: [main]` and narrow `paths` filters where possible. Never use `pull_request`, `pull_request_target`, `merge_group`, or feature-branch push triggers.
+3. Every job must have an effective `github.ref == 'refs/heads/main'` condition, including manual jobs. Retain all current approval inputs, disabled gates, permissions, runner labels, concurrency and secrets.
+4. Preserve essential scheduled backups, critical service monitoring and scheduled maintenance after checking their purpose. They operate on the default `main` branch; do not silently disable them.
+5. Run tests locally on development branches; GitHub Actions verification happens on `main`. Agents must not trigger Actions on feature branches. GitHub may record a skipped manual run, and old branch copies of workflows may not carry the new guards.
+6. Before introducing or changing a workflow, inventory existing YAML files, verify triggers and job guards, and document any automatic-run exception. Check branch protection requirements when removing PR checks. Never claim successful CI without inspecting the real run.
