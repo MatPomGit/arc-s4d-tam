@@ -547,3 +547,10 @@ A task is complete only when all applicable items are true:
 
 These are mandatory conventions for Python code changed by AI agents in this
 repository.
+
+## GitHub Actions: obowiązująca polityka dla agentów AI
+
+- Działania kosztowne, testy, manuskrypty i audyty badań uruchamiać **ręcznie** przez `workflow_dispatch` tylko z `main`. Nie uruchamiać workflow po PR i na gałęziach roboczych.
+- Automatyczne wyjątki: dokumentacja i CodeQL tylko po `push` na `main`, z wąskim filtrem `paths`. Każdy nowy wyjątek wymaga uzasadnienia kosztowego.
+- Każdy job musi mieć `github.ref == 'refs/heads/main'`; dotychczasowe warunki zadań nadal obowiązują. Zakaz `pull_request_target`, `workflow_run`, tagów, `repository_dispatch` oraz automatyzacji na innych gałęziach.
+- Testy PR wykonywać lokalnie; nie deklarować nieuruchomionych analiz jako potwierdzonych. W formularzu GitHub zawsze wybierać main, gdyż historyczne YAML na innych gałęziach mogą nie być zabezpieczone.

@@ -1,14 +1,7 @@
 name: Manuscript
 
 on:
-  push:
-    paths:
-      - "manuscript/**"
-      - ".github/workflows/manuscript.yml"
-  pull_request:
-    paths:
-      - "manuscript/**"
-      - ".github/workflows/manuscript.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -19,6 +12,7 @@ concurrency:
 
 jobs:
   latex:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

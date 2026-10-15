@@ -1,24 +1,6 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "src/**"
-      - "tests/**"
-      - "configs/**"
-      - "tools/**"
-      - "pyproject.toml"
-      - ".github/workflows/ci.yml"
-  push:
-    branches: [main]
-    paths:
-      - "src/**"
-      - "tests/**"
-      - "configs/**"
-      - "tools/**"
-      - "pyproject.toml"
-      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 permissions:
@@ -34,6 +16,7 @@ defaults:
 
 jobs:
   tests:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Tests / Python ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -63,6 +46,7 @@ jobs:
         run: python -m pytest --cov=s4dtam_benchmark --cov-report=term-missing
 
   quality:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Code quality / Python 3.12
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -91,7 +75,7 @@ jobs:
 
   smoke:
     name: Smoke benchmark
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
 
@@ -123,7 +107,7 @@ jobs:
 
   release-integrity:
     name: Release integrity
-    if: github.event_name == 'workflow_dispatch'
+    if: ${{ (github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
 

@@ -1,13 +1,6 @@
 name: Documentation
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "requirements-docs.txt"
-      - ".github/workflows/docs.yml"
   push:
     branches: [main]
     paths:
@@ -28,6 +21,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Build documentation
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -61,7 +55,7 @@ jobs:
 
   deploy:
     name: Deploy GitHub Pages
-    if: github.event_name != 'pull_request'
+    if: ${{ (github.event_name != 'pull_request') && github.ref == 'refs/heads/main' }}
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10

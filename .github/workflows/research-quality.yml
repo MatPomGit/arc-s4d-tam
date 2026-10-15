@@ -1,21 +1,6 @@
 name: Research quality manifest
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "research/**"
-      - "docs/**"
-      - "PROJECT_STATE.yaml"
-      - "AGENTS.md"
-      - ".github/workflows/research-quality.yml"
-  pull_request:
-    paths:
-      - "research/**"
-      - "docs/**"
-      - "PROJECT_STATE.yaml"
-      - "AGENTS.md"
-      - ".github/workflows/research-quality.yml"
   workflow_dispatch:
 
 permissions:
@@ -27,6 +12,7 @@ concurrency:
 
 jobs:
   quality-manifest:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

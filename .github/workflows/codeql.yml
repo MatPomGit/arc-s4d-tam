@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   analyze:
+    if: ${{ github.ref == 'refs/heads/main' }}
     name: Security analysis
     runs-on: ubuntu-24.04
     timeout-minutes: 15
