@@ -563,3 +563,20 @@ repository.
 4. Preserve essential scheduled backups, critical service monitoring and scheduled maintenance after checking their purpose. They operate on the default `main` branch; do not silently disable them.
 5. Run tests locally on development branches; GitHub Actions verification happens on `main`. Agents must not trigger Actions on feature branches. GitHub may record a skipped manual run, and old branch copies of workflows may not carry the new guards.
 6. Before introducing or changing a workflow, inventory existing YAML files, verify triggers and job guards, and document any automatic-run exception. Check branch protection requirements when removing PR checks. Never claim successful CI without inspecting the real run.
+
+## Complete delivery before starting new work
+
+Follow the [shared delivery pipeline](https://github.com/MatPomGit/research-autopilot/blob/41ddb950a363df2ef78850ac9766c130880b2fd9/docs/architecture/DELIVERY_PIPELINE.md). Research Autopilot remains the sole controller.
+
+Before starting a feature, read the complete current PR inventory and existing task ownership. Finish the repository's existing PR first. Reuse its branch for repairs.
+
+Limit autonomous feature work to one active PR per repository and five across the managed portfolio. Count drafts, testing, review and repair as active work. A blocked PR does not free a feature slot.
+
+Prioritize repairs, validation, review, authorized merge and branch cleanup before new features. Handle security and dependency blockers first. Do not create a separate report-only PR for each validation run.
+
+Use reusable validators from a trusted controller revision. Run one bounded batch per host, with isolated execution, exact source SHAs and separate check results. Record FAIL, BLOCKED, UNAVAILABLE and NOT_RUN without treating them as PASS. Syntax checks do not establish scientific validity or teaching-material correctness.
+
+After the applicable checks, reviews and current GitHub rules pass, merge within existing user authorization. Do not request the same authorization again. Delete only a confirmed merged, owned branch after verifying its current SHA and that no dependent PR needs it. Merge does not authorize deployment or publication.
+
+For blocked work, record the reason, required exit condition and next safe action. Continue unrelated authorized repairs without starting another feature in the blocked repository. Report completed merges, remaining PR age and blockers; do not use PR creation count as the progress metric.
+
