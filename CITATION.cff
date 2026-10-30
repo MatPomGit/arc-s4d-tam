@@ -8,5 +8,5 @@ authors:
   - family-names: Pomianek
     given-names: Mateusz
 license: Apache-2.0
-repository-code: "https://github.com/OWNER/s4d-tam-benchmark"
+repository-code: "https://github.com/MatPomGit/arc-s4d-tam"
 abstract: "Reproducible evaluation framework and Python reference implementation for S4D-TAM."
