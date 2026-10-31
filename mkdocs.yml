@@ -126,6 +126,7 @@ nav:
       - Independent reproduction package: independent-reproduction-package.md
       - Compliance report: compliance-report.md
   - Development:
+      - Detailed agent policy: development/agent-policy-details.md
       - Next steps: next-steps.md
       - Roadmap: roadmap.md
       - Contributing: contributing.md

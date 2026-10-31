@@ -135,3 +135,5 @@ Citation metadata is maintained in [CITATION.cff](CITATION.cff). The documentati
 ## License
 
 The project is distributed under the Apache-2.0 license. Dataset and baseline licenses remain with their respective owners.
+
+Instructions for AI contributors: [AGENTS.md](AGENTS.md) and [detailed policy](docs/development/agent-policy-details.md).
