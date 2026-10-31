@@ -1,6 +1,6 @@
 # Detailed S4D-TAM agent policies
 
-**Source:** previous `AGENTS.md` from main commit `397b7f61d1e1881ded761e15b25449009cf9dc3f`. Its full contents are preserved verbatim after this introduction. Repository paths within that content are root-relative. The concise [main instructions](../../AGENTS.md) provide precedence and conditional routing.
+**Source:** previous `AGENTS.md` from main commit `397b7f61d1e1881ded761e15b25449009cf9dc3f`. Its full contents are preserved verbatim after this introduction. Repository paths within that content are root-relative. The concise root `AGENTS.md` provide precedence and conditional routing.
 
 ---
 
