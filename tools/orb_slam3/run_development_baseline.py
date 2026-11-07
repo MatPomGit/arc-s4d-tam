@@ -23,6 +23,11 @@ from s4dtam_benchmark.baseline_evidence import validate_and_freeze_baseline_evid
 from s4dtam_benchmark.config import load_yaml
 from s4dtam_benchmark.datasets import TartanAirDataset
 from s4dtam_benchmark.evaluation import evaluate_result
+from s4dtam_benchmark.orb_slam3_tartanair import (
+    _declared_fps,
+    _render_settings,
+    _validated_calibration,
+)
 from s4dtam_benchmark.tartanair_orb_pipeline import _verify_frozen_files
 
 
@@ -37,7 +42,7 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _validated_input(directory: Path, sequence_id: str) -> None:
+def _validated_input(directory: Path, sequence_id: str, converted_root: Path) -> None:
     manifest_path = directory / "input-manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if manifest.get("sequence_id") != sequence_id:
@@ -50,9 +55,37 @@ def _validated_input(directory: Path, sequence_id: str) -> None:
         candidate = (directory / manifest[key]).resolve()
         if not candidate.is_file() or _sha256(candidate) != manifest[hash_key]:
             raise ValueError(f"ORB input checksum mismatch: {key} ({sequence_id})")
+    source_descriptor = (directory / manifest["source_sequence_descriptor"]).resolve()
+    expected_descriptor = (converted_root / sequence_id / "sequence.json").resolve()
+    if source_descriptor != expected_descriptor:
+        raise ValueError(f"ORB source descriptor does not match frozen cohort: {sequence_id}")
+    descriptor = json.loads(expected_descriptor.read_text(encoding="utf-8"))
+    frames = descriptor.get("frames", [])
+    if not frames or len(frames) != manifest.get("frame_count"):
+        raise ValueError(f"ORB frame count differs from frozen descriptor: {sequence_id}")
+
+    expected_lines = [
+        f"{float(frame['timestamp']):.9f} "
+        + os.path.relpath(
+            converted_root / sequence_id / str(frame["file"]), start=directory
+        ).replace(os.sep, "/")
+        for frame in frames
+    ]
+    actual_lines = [
+        line.strip()
+        for line in (directory / "rgb.txt").read_text(encoding="utf-8").splitlines()
+        if line.strip() and not line.startswith("#")
+    ]
+    if actual_lines != expected_lines:
+        raise ValueError(f"ORB rgb.txt differs from frozen descriptor: {sequence_id}")
+
     settings = (directory / "settings.yaml").read_text(encoding="utf-8")
-    if "Camera.RGB: 0" not in settings.splitlines():
-        raise ValueError(f"ORB-SLAM3 requires OpenCV BGR settings: {sequence_id}")
+    expected_settings = _render_settings(
+        _validated_calibration(descriptor, sequence_id),
+        _declared_fps(descriptor, sequence_id),
+    )
+    if settings != expected_settings or "Camera.RGB: 0" not in settings.splitlines():
+        raise ValueError(f"ORB settings differ from pinned camera input: {sequence_id}")
 
 
 def run_baseline(work: Path, expected_freeze_sha256: str, output_dir: Path) -> dict[str, Any]:
@@ -95,7 +128,7 @@ def run_baseline(work: Path, expected_freeze_sha256: str, output_dir: Path) -> d
 
     # Check all inputs before starting any baseline execution.
     for sequence_id in sequence_ids:
-        _validated_input(prepared / sequence_id, sequence_id)
+        _validated_input(prepared / sequence_id, sequence_id, converted)
 
     result_root = output_dir / "results"
     commands: list[str] = []
