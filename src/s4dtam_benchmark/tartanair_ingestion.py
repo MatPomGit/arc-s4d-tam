@@ -185,6 +185,10 @@ def freeze_tartanair_cohort(
     """
     root = Path(converted_root)
     destination = Path(output_dir)
+    if (destination / "freeze.json").exists():
+        raise FileExistsError(
+            f"TartanAir freeze already exists: {destination}; use a new output directory"
+        )
     sequences = list(TartanAirDataset(root).sequences())
     descriptors = sorted(root.glob("*/sequence.json"))
     if len(descriptors) != len(sequences):
@@ -213,7 +217,7 @@ def freeze_tartanair_cohort(
     )
     manifest_hash = _sha256_bytes(manifest_text.encode("utf-8"))
     raw_manifest_text = (
-        _audit_tartanair_v1_sources(Path(raw_root), root, descriptors)
+        _audit_tartanair_v1_sources(Path(raw_root), descriptors)
         if raw_root is not None
         else None
     )
@@ -234,7 +238,7 @@ def freeze_tartanair_cohort(
         "sequence_list_sha256": sequence_list_hash,
         "file_manifest": "files.sha256",
         "file_manifest_sha256": manifest_hash,
-        "raw_source_validation": "byte_matched" if raw_manifest_text is not None else "not_performed",
+        "raw_source_validation": "source_matched" if raw_manifest_text is not None else "not_performed",
     }
     if raw_manifest_text is not None:
         (destination / "raw-files.sha256").write_text(raw_manifest_text, encoding="utf-8")
@@ -255,9 +259,7 @@ def freeze_tartanair_cohort(
     )
 
 
-def _audit_tartanair_v1_sources(
-    raw_root: Path, converted_root: Path, descriptors: list[Path]
-) -> str:
+def _audit_tartanair_v1_sources(raw_root: Path, descriptors: list[Path]) -> str:
     """Verify each converted pose and RGB frame against its exact upstream file."""
     raw_root = raw_root.resolve()
     if not raw_root.is_dir():
@@ -307,6 +309,7 @@ def _audit_tartanair_v1_sources(
         f"{_sha256_file(path)}  {relative}\n"
         for relative, path in sorted(source_files.items())
     )
+
 
 def _materialize_frame(source: Path, target: Path, mode: str) -> None:
     if mode == "copy":
