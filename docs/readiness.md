@@ -143,7 +143,7 @@ freeze.json
 
 When `--raw-root` is supplied, the freeze independently hashes the original
 `pose_left.txt` and RGB files, checks that the source poses and frame bytes
-match their converted copies, and records `raw_source_validation: byte_matched`
+match their converted copies, and records `raw_source_validation: source_matched`
 with `raw_source_manifest_sha256`. Without this flag the existing converted
 freeze remains possible, but explicitly records `not_performed` and cannot
 close the upstream provenance gate. The complete dataset release identity,
@@ -153,6 +153,8 @@ separate verification and recording.
 This completes the software path for source-byte provenance, **not** a claim
 that public TartanAir sequences have already been acquired or processed.
 A TartanAir benchmark is simulation-domain evidence, not a real-flight result.
+A completed `freeze.json` is not overwritten: use a new output directory for
+any replacement cohort and record the new manifest identity.
 
 ## Confirmatory freeze gate
 
