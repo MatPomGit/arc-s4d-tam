@@ -67,7 +67,18 @@ The evidence JSON is deterministic for identical inputs so repeating validation 
 
 ## TartanAir first vertical slice
 
-TartanAir is the first real-data gate because it provides a low-friction visual benchmark for checking coordinate transforms, calibration metadata, trajectory alignment and evaluator behavior.
+TartanAir V1 is a **published AirSim-simulated dataset**, not physical-flight
+data. Here, "upstream data" means the authentic source release rather than
+unit-test fixtures. The original AirLab dataset page describes the simulated
+origin and CC BY 4.0 terms: https://theairlab.org/tartanair-dataset/ .
+Record the exact distribution, upstream identity and applicable rights before
+using the cohort. A checksum does not prove a vendor release or authorize reuse.
+
+The V1 source format (640x480 RGB, camera intrinsics, NED poses) is documented
+at https://github.com/castacks/tartanair_tools/blob/master/data_type.md .
+TartanAir is the first ingestion gate because it provides a low-friction visual
+benchmark for checking coordinate transforms, calibration metadata, trajectory
+alignment and evaluator behavior.
 
 ### Raw V1 ingestion
 
@@ -115,7 +126,8 @@ After preflight, freeze the exact converted cohort:
 ```bash
 s4dtam-bench freeze-tartanair \
   data/raw/tartanair-converted \
-  artifacts/manifests/tartanair/frozen
+  artifacts/manifests/tartanair/frozen \
+  --raw-root data/upstream/tartanair
 ```
 
 The command produces:
@@ -123,12 +135,26 @@ The command produces:
 ```text
 sequence-list.txt
 files.sha256
+raw-files.sha256
 freeze.json
 ```
 
 `files.sha256` covers every descriptor and every referenced RGB frame. `freeze.json` records the cohort counts and stable hashes of the file manifest and sequence list.
 
-This completes the software path needed for real TartanAir ingestion, but it is not evidence that public TartanAir sequences have already been processed. The readiness state remains blocked until a pinned real cohort is acquired, converted, validated and frozen.
+When `--raw-root` is supplied, the freeze independently hashes the original
+`pose_left.txt` and RGB files, checks that the source poses and frame bytes
+match their converted copies, and records `raw_source_validation: source_matched`
+with `raw_source_manifest_sha256`. Without this flag the existing converted
+freeze remains possible, but explicitly records `not_performed` and cannot
+close the upstream provenance gate. The complete dataset release identity,
+dataset rights, immutable holdout split and sampling-rate source still require
+separate verification and recording.
+
+This completes the software path for source-byte provenance, **not** a claim
+that public TartanAir sequences have already been acquired or processed.
+A TartanAir benchmark is simulation-domain evidence, not a real-flight result.
+A completed `freeze.json` is not overwritten: use a new output directory for
+any replacement cohort and record the new manifest identity.
 
 ## Confirmatory freeze gate
 

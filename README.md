@@ -39,6 +39,25 @@ Start with:
 - [Datasets](https://matpomgit.github.io/s4d-tam/datasets/) and [Metrics](https://matpomgit.github.io/s4d-tam/metrics/) for experiment design;
 - [Research workflow](docs/research_workflow.md), [Data management plan](docs/data_management_plan.md) and [Research-quality audit](docs/research-quality-audit-2026-10-01.md) for governance and traceability.
 
+### Build the documentation locally
+
+Zensical 0.1.0 replaces Material for MkDocs. The existing `mkdocs.yml` remains the
+configuration source, with the `classic` theme variant to preserve the existing
+navigation and styles. Documentation builds require Python 3.11 or newer (the
+GitHub Pages job uses Python 3.12); the benchmark itself still supports Python 3.10.
+
+```bash
+python3.12 -m venv .venv-docs
+source .venv-docs/bin/activate
+python -m pip install -r requirements-docs.txt
+zensical build --clean --strict
+zensical serve
+```
+
+GitHub Pages deploys the generated `site/` directory through
+`.github/workflows/docs.yml`. For migration notes see
+[Contributing](docs/contributing.md).
+
 ## Quick start
 
 ```bash
@@ -111,7 +130,7 @@ Scientific experiments should use version-controlled configurations, immutable s
 
 ```text
 configs/                  experiment, dataset, readiness and algorithm configuration
-docs/                     MkDocs documentation and validation protocols
+docs/                     Zensical documentation and validation protocols
 manuscript/               canonical modular LaTeX article and publication path
 paper/                    historical PDF, DOCX, XML and earlier LaTeX drafts
 research/                 claim/evidence registries, risks, deviations and decisions
@@ -124,7 +143,7 @@ outputs/                  generated benchmark results, ignored by Git
 
 ## Development and CI
 
-The active-development CI verifies installation, syntax and unit/regression tests on Python 3.10 and 3.12. The smoke benchmark runs on `main`. Ruff findings are currently advisory so that accumulated style debt does not mask numerical failures. Documentation is built with MkDocs in strict mode and deployed through GitHub Pages. A separate research-governance workflow validates the machine-readable project state, evidence/claim registries and required research-quality artifacts.
+The active-development CI verifies installation, syntax and unit/regression tests on Python 3.10 and 3.12. The smoke benchmark runs on `main`. Ruff findings are currently advisory so that accumulated style debt does not mask numerical failures. Documentation is built with Zensical 0.1.0 in strict mode and deployed through GitHub Pages. A separate research-governance workflow validates the machine-readable project state, evidence/claim registries and required research-quality artifacts.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) before modifying scientific contracts, metrics, dataset registration or experiment protocols.
 

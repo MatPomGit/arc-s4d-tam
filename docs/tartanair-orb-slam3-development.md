@@ -1,6 +1,6 @@
 # TartanAir + ORB-SLAM3 development vertical slice
 
-This runbook defines the first end-to-end development comparison used to verify the S4D-TAM publication pipeline before the confirmatory study is frozen.
+This manual runbook defines the first end-to-end development comparison. The canonical checkpointed path is `docs/tartanair-orb-slam3-automation.md`; prefer that path for end-to-end execution. TartanAir V1 is simulated AirSim data, not physical-flight evidence.
 
 It is deliberately restricted to one dataset and one independent external baseline:
 
@@ -48,7 +48,8 @@ Do not guess `TARTANAIR_FPS`; the V1 `pose_left.txt` source does not carry times
 mkdir -p artifacts/manifests/tartanair
 s4dtam-bench freeze-tartanair \
   data/raw/tartanair-converted \
-  artifacts/manifests/tartanair/frozen
+  artifacts/manifests/tartanair/frozen \
+  --raw-root "$TARTANAIR_SOURCE"
 
 cat artifacts/manifests/tartanair/frozen/sequence-list.txt
 cat artifacts/manifests/tartanair/frozen/freeze.json
@@ -75,7 +76,7 @@ artifacts/baseline-inputs/orb_slam3/tartanair/<sequence-id>/
   input-manifest.json
 ```
 
-`rgb.txt` uses the official ORB-SLAM3 `mono_tum` timestamp/path convention. `settings.yaml` is generated from the camera calibration and `declared_fps` stored in that sequence's `sequence.json`, rather than copying calibration from a TUM or EuRoC example. `input-manifest.json` records SHA-256 hashes for the source descriptor, RGB list and generated settings.
+`rgb.txt` uses the official ORB-SLAM3 `mono_tum` timestamp/path convention. `settings.yaml` is generated from the camera calibration and `declared_fps` stored in that sequence's `sequence.json`, rather than copying calibration from a TUM or EuRoC example. The frame-wise runner reads images with OpenCV `cv::imread(..., IMREAD_UNCHANGED)`, which provides BGR/BGRA channels for color PNGs; generated settings therefore set `Camera.RGB: 0` for the pinned ORB-SLAM3 tracker. Regenerate the ORB input directory after any settings-generator change so that `input-manifest.json` is updated; no upstream RGB/pose freeze needs to be rewritten. `input-manifest.json` records SHA-256 hashes for the source descriptor, RGB list and generated settings.
 
 Inspect the prepared inputs before execution:
 
@@ -85,7 +86,7 @@ find artifacts/baseline-inputs/orb_slam3/tartanair -type f -print | sort
 
 ## 5. Reproduce the pinned ORB-SLAM3 implementation
 
-The baseline specification is `configs/algorithms/orb_slam3.yaml`. The repository pins both upstream revision and container digest. Do not substitute another revision or a mutable image tag.
+The baseline specification is `configs/algorithms/orb_slam3.yaml`. The repository pins the upstream revision and its source-build identity; the `container` field is retained for schema compatibility and is not a Docker digest. Follow `docs/tartanair-orb-slam3-automation.md` to build the pinned runner and check its actual binary and vocabulary hashes.
 
 ```bash
 python - <<'PY'
@@ -97,7 +98,7 @@ print("container:", cfg["container"])
 PY
 ```
 
-The official monocular executable has the interface:
+The official upstream monocular entry point is typically invoked as follows, but the repository's verified frame-wise runner is the required implementation for this benchmark:
 
 ```text
 mono_tum path_to_vocabulary path_to_settings path_to_sequence

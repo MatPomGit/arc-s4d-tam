@@ -77,6 +77,8 @@ def test_prepare_orb_slam3_tartanair_inputs(tmp_path: Path) -> None:
     assert "Camera1.cx: 320.000000000" in settings
     assert "Camera1.cy: 240.000000000" in settings
     assert "Camera.fps: 10.000000000" in settings
+    # cv::imread(..., IMREAD_UNCHANGED) delivers BGR/BGRA pixel channels.
+    assert "Camera.RGB: 0" in settings
     assert "Camera.width: 640" in settings
     assert "Camera.height: 480" in settings
 

@@ -1,6 +1,6 @@
 # Automated TartanAir -> ORB-SLAM3 -> S4D-TAM workflow
 
-This document defines the operational procedure for the first reproducible S4D-TAM development comparison. The workflow converts and freezes TartanAir data, builds the exact ORB-SLAM3 baseline, executes it frame-by-frame, normalizes its output, validates the evidence package and finally runs the common evaluator.
+This document defines the operational procedure for the first reproducible S4D-TAM development comparison. TartanAir V1 is a published AirSim simulation dataset; this workflow does not establish evidence from physical UAV flights. The workflow converts and freezes TartanAir data, builds the exact ORB-SLAM3 baseline, executes it frame-by-frame, normalizes its output, validates the evidence package and finally runs the common evaluator.
 
 The automated benchmark entry point is:
 
@@ -164,6 +164,7 @@ Frozen cohort evidence:
 artifacts/manifests/tartanair/frozen/
   sequence-list.txt
   files.sha256
+  raw-files.sha256
   freeze.json
 ```
 
@@ -299,7 +300,7 @@ s4dtam-bench pipeline-tartanair-orb-slam3 \
   configs/pipelines/tartanair_orb_slam3_development.yaml
 ```
 
-Completed stages are skipped; failed stages are retried. If the pipeline YAML hash changes, automatic resume is rejected to prevent mixing two experimental protocols.
+Completed stages are skipped; failed stages are retried. Before ORB-SLAM3 execution, the pipeline now verifies that the recorded freeze includes a source-matched upstream manifest and that both original and converted file hashes are unchanged. Old checkpoints without this evidence cannot be promoted to valid baseline results. If the pipeline YAML hash changes, automatic resume is rejected to prevent mixing two experimental protocols.
 
 To intentionally start a new state:
 
@@ -337,6 +338,7 @@ pipeline-state.json
 TartanAir freeze.json
 TartanAir sequence-list.txt
 TartanAir files.sha256
+TartanAir raw-files.sha256
 ORB-SLAM3 build-manifest.json
 ORB-SLAM3 runner SHA-256
 ORB-SLAM3 vocabulary SHA-256
