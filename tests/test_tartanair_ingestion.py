@@ -9,6 +9,7 @@ import pytest
 
 from s4dtam_benchmark.datasets import TartanAirDataset
 from s4dtam_benchmark.tartanair_ingestion import convert_tartanair_v1, freeze_tartanair_cohort
+from s4dtam_benchmark.tartanair_orb_pipeline import PipelineBlocked, _verify_frozen_files
 
 
 def _write_raw_sequence(root: Path, poses: list[list[float]], frame_indices: list[int]) -> Path:
@@ -193,3 +194,31 @@ def test_freeze_prevents_overwriting_previous_evidence(tmp_path: Path) -> None:
     with pytest.raises(FileExistsError, match="freeze already exists"):
         freeze_tartanair_cohort(converted, evidence, raw_root=raw)
     assert (evidence / "freeze.json").read_bytes() == previous
+
+
+def test_baseline_precheck_rejects_legacy_freeze_without_raw_source(tmp_path: Path) -> None:
+    raw = tmp_path / "raw"
+    _write_raw_sequence(raw, [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]], [0])
+    converted = tmp_path / "converted"
+    evidence = tmp_path / "evidence"
+    convert_tartanair_v1(raw, converted, fps=10.0, link_mode="copy")
+    freeze_tartanair_cohort(converted, evidence)
+
+    with pytest.raises(PipelineBlocked, match="lacks verified upstream"):
+        _verify_frozen_files(converted, evidence, raw)
+
+
+def test_baseline_precheck_rejects_source_change_after_freeze(tmp_path: Path) -> None:
+    raw = tmp_path / "raw"
+    trajectory = _write_raw_sequence(
+        raw, [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]], [0]
+    )
+    converted = tmp_path / "converted"
+    evidence = tmp_path / "evidence"
+    convert_tartanair_v1(raw, converted, fps=10.0, link_mode="copy")
+    freeze_tartanair_cohort(converted, evidence, raw_root=raw)
+    _verify_frozen_files(converted, evidence, raw)
+
+    (trajectory / "image_left" / "000000_left.png").write_bytes(b"changed")
+    with pytest.raises(ValueError, match="changed after freeze"):
+        _verify_frozen_files(converted, evidence, raw)
