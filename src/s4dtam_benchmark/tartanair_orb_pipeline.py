@@ -123,7 +123,9 @@ def run_tartanair_orb_pipeline(
 
     execute(
         "freeze_tartanair",
-        lambda: freeze_tartanair_cohort(paths["converted_root"], paths["freeze_root"]),
+        lambda: freeze_tartanair_cohort(
+            paths["converted_root"], paths["freeze_root"], raw_root=paths["raw_root"]
+        ),
     )
     if _stop_after(state, "freeze_tartanair", until):
         return _summary(state_path, state, None)
