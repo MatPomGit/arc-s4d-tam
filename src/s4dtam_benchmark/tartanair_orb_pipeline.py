@@ -397,7 +397,7 @@ def _verify_frozen_files(
             # A converted RGB frame may be a symlink to the already audited
             # upstream cohort (link_mode=symlink). Permit that one resolved
             # location, while rejecting links to arbitrary third-party paths.
-            allowed_roots = (root_resolved,)
+            allowed_roots: tuple[Path, ...] = (root_resolved,)
             if name == "files.sha256":
                 allowed_roots += (raw_root.resolve(),)
             if not any(path.is_relative_to(allowed) for allowed in allowed_roots):
