@@ -1,6 +1,7 @@
 """Checkpointed orchestration for the TartanAir -> ORB-SLAM3 -> S4D-TAM pipeline."""
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import os
@@ -170,10 +171,56 @@ def run_tartanair_orb_pipeline(
         return _summary(state_path, state, None)
 
     benchmark_output = execute(
-        "run_common_benchmark", lambda: run_experiment(paths["experiment_config"])
+        "run_common_benchmark",
+        lambda: _run_checked_comparison(paths["experiment_config"], paths["freeze_root"]),
     )
     output_dir = Path(benchmark_output) if benchmark_output is not None else None
     return _summary(state_path, state, output_dir)
+
+
+def _run_checked_comparison(experiment_config: Path, freeze_root: Path) -> Path:
+    """Fail closed unless both algorithms cover every frozen sequence."""
+    output_dir = Path(run_experiment(experiment_config))
+    _require_comparison_coverage(output_dir, freeze_root)
+    return output_dir
+
+
+def _require_comparison_coverage(output_dir: Path, freeze_root: Path) -> None:
+    """Do not mark a partial ORB-SLAM3-only evaluation as a completed comparison."""
+    sequence_file = freeze_root / "sequence-list.txt"
+    sequence_ids = [
+        line.strip() for line in sequence_file.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    if not sequence_ids:
+        raise PipelineBlocked(f"Frozen TartanAir sequence list is empty: {sequence_file}")
+
+    metrics_path = output_dir / "metrics_long.csv"
+    if not metrics_path.is_file():
+        raise PipelineBlocked(f"Comparison metrics are missing: {metrics_path}")
+
+    with metrics_path.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        required_fields = {"dataset", "sequence", "algorithm"}
+        if not required_fields.issubset(reader.fieldnames or []):
+            raise PipelineBlocked(f"Malformed comparison metrics: {metrics_path}")
+        observed = {
+            (row["dataset"], row["sequence"], row["algorithm"]) for row in reader
+        }
+
+    required = {
+        ("tartanair", sequence_id, algorithm)
+        for sequence_id in sequence_ids
+        for algorithm in ("s4d_tam_reference", "orb_slam3")
+    }
+    missing = sorted(required - observed)
+    if missing:
+        raise PipelineBlocked(
+            "Incomplete TartanAir development comparison; missing algorithm/sequence "
+            f"metric rows: {missing}. Inspect {output_dir / 'failures.json'}. "
+            "Source data were not modified. Baseline-only output cannot satisfy the "
+            "two-algorithm comparison gate."
+        )
 
 
 def _validate_pipeline_config(config: dict[str, Any]) -> None:
