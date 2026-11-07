@@ -24,6 +24,8 @@ DoR: objective, measurable acceptance, dependencies, owner, data rights and safe
 
 Apply KISS, DRY, YAGNI, single source of truth, separation of concerns, least privilege, compatible public interfaces and explicit errors. Before modifying Python, C++, ROS 2, robotics adapters, GUI, ML or packaging, read [full coding requirements](docs/development/agent-policy-details.md#5-software-engineering-principles), [Python rules](docs/development/agent-policy-details.md#6-python-requirements) and [environments](docs/development/agent-policy-details.md#7-dependencies-and-environments) as applicable. Use PEP 8/20/257/484 where relevant. Avoid new dependencies, packages, settings or services without proven need.
 
+Documentation builds use Zensical 0.1.0 (`python -m pip install -r requirements-docs.txt`, then `zensical build --clean --strict`). The previous `mkdocs build --strict` instruction in the archived agent policy is superseded for current documentation. Keep `mkdocs.yml` as the canonical configuration and Python 3.12 for documentation CI.
+
 ## Exact-SHA validation, integration and cleanup
 
 Read [tests](docs/development/agent-policy-details.md#8-tests-and-verification), [PR discipline](docs/development/agent-policy-details.md#14-git-and-pull-request-discipline) and [GitHub Actions rules](docs/development/agent-policy-details.md#github-actions-obowiązująca-polityka-dla-agentów-ai) before review or merge. Private workflows remain manual-first with documented exceptions. No unapproved spend, unsafe workflow trigger or CI bypass.
