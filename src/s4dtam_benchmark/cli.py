@@ -80,6 +80,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     freeze_tartanair.add_argument("converted_root", type=Path)
     freeze_tartanair.add_argument("output_dir", type=Path)
+    freeze_tartanair.add_argument(
+        "--raw-root", type=Path, help="attest exact upstream pose/RGB files and hashes"
+    )
 
     orb_inputs = subparsers.add_parser(
         "prepare-orb-slam3-tartanair",
@@ -178,7 +181,9 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {sequence.sequence_id}: samples={len(sequence.timestamps)}")
         return 0
     if args.command == "freeze-tartanair":
-        freeze_summary = freeze_tartanair_cohort(args.converted_root, args.output_dir)
+        freeze_summary = freeze_tartanair_cohort(
+            args.converted_root, args.output_dir, raw_root=args.raw_root
+        )
         print(
             f"Frozen TartanAir cohort: sequences={freeze_summary.sequences} "
             f"frames={freeze_summary.frames} files={freeze_summary.files}"
