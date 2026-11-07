@@ -170,7 +170,7 @@ Camera1.k2: {float(distortion[1]):.9f}
 Camera1.p1: {float(distortion[2]):.9f}
 Camera1.p2: {float(distortion[3]):.9f}
 Camera.fps: {fps:.9f}
-Camera.RGB: 1
+Camera.RGB: 0
 Camera.width: {int(width)}
 Camera.height: {int(height)}
 ORBextractor.nFeatures: 1000
