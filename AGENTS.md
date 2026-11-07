@@ -1,5 +1,10 @@
 # S4D-TAM agent operating instructions
 
+## Submission-first editorial directive (2026-11-07)
+
+Follow [RESEARCH.md](RESEARCH.md#submission-first-publication-policy-author-directive-2026-11-07): prioritize author-approved submission of a scientifically defensible, completed manuscript over indefinite polishing driven by fear of rejection. An achievable publication even at 20 verified Polish evaluation points is preferable to an unpublished manuscript, but points and acceptance are not guaranteed. Prepare a journal shortlist, requirements, submission package and author decision; after rejection, propose revision and resubmission. Never bypass evidence, ethics, consent, novelty, safety or author-approval gates; do not submit, contact publishers or incur APC without explicit author approval.
+
+
 **Version:** 2.0.0 (2026-10-31). Scope: entire repository; scoped AGENTS.md applies to its subtree.
 
 ## Hierarchy and required sources
