@@ -9,7 +9,7 @@ The roadmap distinguishes between **software components that exist as executable
 - [x] core trajectory, semantic, forecasting, navigation, efficiency and statistical metrics
 - [x] paper-oriented CSV, LaTeX, plot and run-manifest outputs
 - [x] CI across supported Python versions
-- [x] strict MkDocs documentation build and GitHub Pages deployment
+- [x] strict Zensical 0.1.0 documentation build and GitHub Pages deployment
 - [x] reproduction-package and release-integrity utilities
 - [x] explicit two-level comparison contract separating external benchmarking from internal H1-H7 mechanism studies
 
