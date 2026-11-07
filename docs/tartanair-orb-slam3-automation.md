@@ -230,6 +230,35 @@ python3 tools/orb_slam3/run_sequence.py \
   --output outputs/baselines/orb_slam3/tartanair/<sequence-id>.npz
 ```
 
+### Standalone, source-verified baseline pilot
+
+For the already frozen TartanAir V1 `japanesealley/Hard/P003` development
+cohort, reproducibly run ORB-SLAM3 and generate complete baseline evidence
+**before** the S4D-TAM candidate becomes available:
+
+```bash
+WORK="${HOME}/datasets/tartanair-v1/dev-pilot-v1"
+export LD_LIBRARY_PATH="$WORK/orb-slam3-source/lib:$WORK/orb-slam3-source/Thirdparty/DBoW2/lib:$WORK/orb-slam3-source/Thirdparty/g2o/lib:$WORK/local/lib:$WORK/local/lib64:${LD_LIBRARY_PATH:-}"
+
+python tools/orb_slam3/run_development_baseline.py \
+  --work "$WORK" \
+  --expected-freeze-sha256 b05ada047a66df9dae9b07f9c7af9788a4288ae30389dc289620053479b87df9
+```
+
+The runner verifies original/converted frozen SHA-256 manifests, the requested
+cohort identity, per-sequence ORB input manifests, camera BGR order and exact
+ORB-SLAM3 build revision before running a single frame. It saves only new
+outputs under `$WORK/orb-baseline-development`: normalized NPZ, immutable
+baseline evidence, actual hardware/command metadata and baseline-only
+trajectory/tracking/resource metrics. Existing experiment output is **never
+overwritten**. The results are explicitly labeled development and
+`comparison_completed: false`, with `fps_source_verified: false`.
+
+This workflow does not attempt to invent the missing S4D-TAM visual odometry
+front end. The full comparison pipeline remains blocked until the candidate
+can produce a legitimate observation-derived localization result on the
+same frozen RGB inputs.
+
 ## 7. Normalized result contract
 
 Each ORB-SLAM3 result contains at least:
