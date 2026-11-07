@@ -222,3 +222,40 @@ def test_baseline_precheck_rejects_source_change_after_freeze(tmp_path: Path) ->
     (trajectory / "image_left" / "000000_left.png").write_bytes(b"changed")
     with pytest.raises(ValueError, match="changed after freeze"):
         _verify_frozen_files(converted, evidence, raw)
+
+
+def test_baseline_precheck_accepts_audited_source_symlinks(tmp_path: Path) -> None:
+    raw = tmp_path / "raw"
+    trajectory = _write_raw_sequence(
+        raw, [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]], [0]
+    )
+    converted = tmp_path / "converted"
+    evidence = tmp_path / "evidence"
+    convert_tartanair_v1(raw, converted, fps=10.0, link_mode="symlink")
+    frame = converted / "AbandonedFactory__Easy__P000" / "frames" / "000000_left.png"
+    assert frame.is_symlink()
+    freeze_tartanair_cohort(converted, evidence, raw_root=raw)
+    _verify_frozen_files(converted, evidence, raw)
+
+    (trajectory / "image_left" / "000000_left.png").write_bytes(b"changed")
+    with pytest.raises(ValueError, match="changed after freeze"):
+        _verify_frozen_files(converted, evidence, raw)
+
+
+def test_baseline_precheck_rejects_symlink_outside_audited_roots(tmp_path: Path) -> None:
+    raw = tmp_path / "raw"
+    _write_raw_sequence(
+        raw, [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]], [0]
+    )
+    converted = tmp_path / "converted"
+    evidence = tmp_path / "evidence"
+    convert_tartanair_v1(raw, converted, fps=10.0, link_mode="symlink")
+    freeze_tartanair_cohort(converted, evidence, raw_root=raw)
+
+    external = tmp_path / "untrusted.png"
+    external.write_bytes(b"frame-0")
+    frame = converted / "AbandonedFactory__Easy__P000" / "frames" / "000000_left.png"
+    frame.unlink()
+    frame.symlink_to(external)
+    with pytest.raises(ValueError, match="escapes root"):
+        _verify_frozen_files(converted, evidence, raw)
