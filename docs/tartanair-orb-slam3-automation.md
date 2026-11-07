@@ -74,7 +74,28 @@ The repository uses the official ORB-SLAM3 v1.0 source revision:
 
 The previous placeholder revision and unverified GHCR digest are not used. The execution identity is now an exact source build produced by the repository script.
 
-Install the system dependencies required by the official ORB-SLAM3 build, including a C++ compiler, CMake, OpenCV, Eigen, Pangolin and Boost. Then run:
+Install the system dependencies required by the official ORB-SLAM3 build, including a C++ compiler, CMake, OpenCV, Eigen, Pangolin and Boost. The verified local Fedora 43 / GCC 15 pilot stopped when the unmodified Pangolin v0.6 sources relied on transitive `uint8_t`/`uint16_t` declarations. The repository therefore provides a reproducible **local, source-unmodified** build of the exact Pangolin v0.6 commit. CMake's `-include cstdint` compiler flag restores declarations for the old source without changing the pin:
+
+```bash
+WORK="${HOME}/datasets/tartanair-v1/dev-pilot-v1"
+bash tools/orb_slam3/build_pangolin.sh \
+  --source "$WORK/pangolin-v0.6" \
+  --prefix "$WORK/local" \
+  --jobs 4
+
+export CMAKE_PREFIX_PATH="$WORK/local:${CMAKE_PREFIX_PATH:-}"
+export LD_LIBRARY_PATH="$WORK/local/lib:$WORK/local/lib64:${LD_LIBRARY_PATH:-}"
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
+
+bash tools/orb_slam3/build_runner.sh \
+  --source "$WORK/orb-slam3-source" \
+  --output "$WORK/orb-build" \
+  --jobs 4
+```
+
+The helper refuses a changed Pangolin source revision or modified tracked source files, emits `pangolin-build-manifest.json` containing the installed library checksums, and installs only under the selected prefix. The ORB runner still uses the unchanged pinned revision and its independent build manifest. An actual successful native build on Fedora 43 remains pending; no compatibility claim is made based on the compiler fix alone.
+
+On other hosts with a separately verified Pangolin installation, continue using:
 
 ```bash
 bash tools/orb_slam3/build_runner.sh
@@ -263,7 +284,20 @@ outputs/baselines/orb_slam3/tartanair/<sequence-id>.npz
 The pipeline then performs:
 
 - `validate_baseline_evidence`;
-- `run_common_benchmark`.
+- `run_common_benchmark`, with a mandatory check for **both** `s4d_tam_reference`
+  and `orb_slam3` metrics on **every** frozen sequence.
+
+**Current scientific blocker (2026-11-07).** The TartanAir V1 adapter provides
+PNG path observations (`[N]` string values), while the present
+`S4DTAMReference` accepts synchronized numeric modality streams or legacy
+`[N,3]` numerical observations. Therefore the current candidate cannot run on
+this RGB cohort without a genuine sensor-to-pose inference adapter. The
+baseline may yield a valid stand-alone ORB-SLAM3 reproduction, but the common
+evaluation **must fail** the two-algorithm comparison gate if the candidate is
+missing. Do not convert filename strings into ground-truth positions, use
+ground-truth trajectories as candidate inputs, fabricate candidate poses or
+call a baseline-only table a comparison. Keep all failure records, tracking
+losses and incomplete metrics.
 
 A successful process exit alone is not accepted as reproduction evidence.
 
