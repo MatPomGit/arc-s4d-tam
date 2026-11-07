@@ -76,7 +76,7 @@ artifacts/baseline-inputs/orb_slam3/tartanair/<sequence-id>/
   input-manifest.json
 ```
 
-`rgb.txt` uses the official ORB-SLAM3 `mono_tum` timestamp/path convention. `settings.yaml` is generated from the camera calibration and `declared_fps` stored in that sequence's `sequence.json`, rather than copying calibration from a TUM or EuRoC example. `input-manifest.json` records SHA-256 hashes for the source descriptor, RGB list and generated settings.
+`rgb.txt` uses the official ORB-SLAM3 `mono_tum` timestamp/path convention. `settings.yaml` is generated from the camera calibration and `declared_fps` stored in that sequence's `sequence.json`, rather than copying calibration from a TUM or EuRoC example. The frame-wise runner reads images with OpenCV `cv::imread(..., IMREAD_UNCHANGED)`, which provides BGR/BGRA channels for color PNGs; generated settings therefore set `Camera.RGB: 0` for the pinned ORB-SLAM3 tracker. Regenerate the ORB input directory after any settings-generator change so that `input-manifest.json` is updated; no upstream RGB/pose freeze needs to be rewritten. `input-manifest.json` records SHA-256 hashes for the source descriptor, RGB list and generated settings.
 
 Inspect the prepared inputs before execution:
 
