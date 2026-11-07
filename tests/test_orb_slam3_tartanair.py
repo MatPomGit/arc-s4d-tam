@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import importlib.util
 import json
 from pathlib import Path
 
@@ -111,3 +113,71 @@ def test_prepare_requires_declared_fps(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="declared_fps"):
         prepare_orb_slam3_tartanair_inputs(converted, output)
+
+
+def _baseline_input_validator():
+    script = Path(__file__).parents[1] / "tools/orb_slam3/run_development_baseline.py"
+    spec = importlib.util.spec_from_file_location("s4dtam_orb_baseline_pilot", script)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module._validated_input
+
+
+def test_baseline_pilot_validates_generated_frozen_camera_inputs(tmp_path: Path) -> None:
+    converted = tmp_path / "converted"
+    inputs = tmp_path / "orb-inputs"
+    _write_sequence(converted)
+    prepare_orb_slam3_tartanair_inputs(converted, inputs)
+
+    validate = _baseline_input_validator()
+    directory = inputs / "env__Easy__P000"
+    validate(directory, "env__Easy__P000", converted)
+
+
+def test_baseline_pilot_rejects_self_consistent_but_altered_rgb_list(tmp_path: Path) -> None:
+    converted = tmp_path / "converted"
+    inputs = tmp_path / "orb-inputs"
+    _write_sequence(converted)
+    prepare_orb_slam3_tartanair_inputs(converted, inputs)
+
+    directory = inputs / "env__Easy__P000"
+    rgb_path = directory / "rgb.txt"
+    rgb_path.write_text(
+        rgb_path.read_text(encoding="utf-8").replace(
+            "000000_left.png", "000001_left.png"
+        ),
+        encoding="utf-8",
+    )
+    manifest_path = directory / "input-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["rgb_list_sha256"] = hashlib.sha256(rgb_path.read_bytes()).hexdigest()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="rgb.txt differs from frozen descriptor"):
+        _baseline_input_validator()(directory, "env__Easy__P000", converted)
+
+
+def test_baseline_pilot_rejects_calibration_drift_even_with_matching_hash(
+    tmp_path: Path,
+) -> None:
+    converted = tmp_path / "converted"
+    inputs = tmp_path / "orb-inputs"
+    _write_sequence(converted)
+    prepare_orb_slam3_tartanair_inputs(converted, inputs)
+
+    directory = inputs / "env__Easy__P000"
+    settings_path = directory / "settings.yaml"
+    settings_path.write_text(
+        settings_path.read_text(encoding="utf-8").replace(
+            "Camera1.fx: 320.000000000", "Camera1.fx: 321.000000000"
+        ),
+        encoding="utf-8",
+    )
+    manifest_path = directory / "input-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["settings_sha256"] = hashlib.sha256(settings_path.read_bytes()).hexdigest()
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="settings differ from pinned camera input"):
+        _baseline_input_validator()(directory, "env__Easy__P000", converted)
