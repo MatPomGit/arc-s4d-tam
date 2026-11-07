@@ -394,7 +394,13 @@ def _verify_frozen_files(
             if relative_path.is_absolute() or ".." in relative_path.parts:
                 raise ValueError(f"Unsafe TartanAir manifest path: {relative}")
             path = (root_resolved / relative_path).resolve()
-            if not path.is_relative_to(root_resolved):
+            # A converted RGB frame may be a symlink to the already audited
+            # upstream cohort (link_mode=symlink). Permit that one resolved
+            # location, while rejecting links to arbitrary third-party paths.
+            allowed_roots = (root_resolved,)
+            if name == "files.sha256":
+                allowed_roots += (raw_root.resolve(),)
+            if not any(path.is_relative_to(allowed) for allowed in allowed_roots):
                 raise ValueError(f"TartanAir manifest path escapes root: {relative}")
             if not path.is_file():
                 raise FileNotFoundError(f"Frozen TartanAir file missing: {path}")
