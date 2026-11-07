@@ -175,8 +175,14 @@ def convert_tartanair_v1(
 def freeze_tartanair_cohort(
     converted_root: str | Path,
     output_dir: str | Path,
+    *,
+    raw_root: str | Path | None = None,
 ) -> TartanAirFreezeSummary:
-    """Validate and hash a converted TartanAir cohort into immutable evidence files."""
+    """Freeze converted inputs and optionally attest matching upstream V1 bytes.
+
+    Without raw_root, only the converted artifacts are hashed. That limited
+    result must not be presented as verified upstream dataset provenance.
+    """
     root = Path(converted_root)
     destination = Path(output_dir)
     sequences = list(TartanAirDataset(root).sequences())
@@ -184,11 +190,8 @@ def freeze_tartanair_cohort(
     if len(descriptors) != len(sequences):
         raise ValueError("TartanAir descriptor discovery does not match validated sequence count")
 
-    destination.mkdir(parents=True, exist_ok=True)
     sequence_ids = [sequence.sequence_id for sequence in sequences]
     sequence_list_text = "".join(f"{sequence_id}\n" for sequence_id in sequence_ids)
-    sequence_list_path = destination / "sequence-list.txt"
-    sequence_list_path.write_text(sequence_list_text, encoding="utf-8")
     sequence_list_hash = _sha256_bytes(sequence_list_text.encode("utf-8"))
 
     files: dict[str, Path] = {}
@@ -205,12 +208,20 @@ def freeze_tartanair_cohort(
             files[rel] = path
             frame_count += 1
 
-    manifest_lines = [f"{_sha256_file(path)}  {relative}\n" for relative, path in sorted(files.items())]
-    manifest_text = "".join(manifest_lines)
-    manifest_path = destination / "files.sha256"
-    manifest_path.write_text(manifest_text, encoding="utf-8")
+    manifest_text = "".join(
+        f"{_sha256_file(path)}  {relative}\n" for relative, path in sorted(files.items())
+    )
     manifest_hash = _sha256_bytes(manifest_text.encode("utf-8"))
+    raw_manifest_text = (
+        _audit_tartanair_v1_sources(Path(raw_root), root, descriptors)
+        if raw_root is not None
+        else None
+    )
 
+    # No output is written until the converted and optional upstream audits pass.
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / "sequence-list.txt").write_text(sequence_list_text, encoding="utf-8")
+    (destination / "files.sha256").write_text(manifest_text, encoding="utf-8")
     freeze = {
         "schema": "s4dtam-tartanair-freeze/v1",
         "dataset": "tartanair",
@@ -219,11 +230,18 @@ def freeze_tartanair_cohort(
         "sequence_count": len(sequences),
         "frame_count": frame_count,
         "file_count": len(files),
-        "sequence_list": sequence_list_path.name,
+        "sequence_list": "sequence-list.txt",
         "sequence_list_sha256": sequence_list_hash,
-        "file_manifest": manifest_path.name,
+        "file_manifest": "files.sha256",
         "file_manifest_sha256": manifest_hash,
+        "raw_source_validation": "byte_matched" if raw_manifest_text is not None else "not_performed",
     }
+    if raw_manifest_text is not None:
+        (destination / "raw-files.sha256").write_text(raw_manifest_text, encoding="utf-8")
+        freeze["raw_source_manifest"] = "raw-files.sha256"
+        freeze["raw_source_manifest_sha256"] = _sha256_bytes(
+            raw_manifest_text.encode("utf-8")
+        )
     (destination / "freeze.json").write_text(
         json.dumps(freeze, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
@@ -236,6 +254,59 @@ def freeze_tartanair_cohort(
         sequence_list_sha256=sequence_list_hash,
     )
 
+
+def _audit_tartanair_v1_sources(
+    raw_root: Path, converted_root: Path, descriptors: list[Path]
+) -> str:
+    """Verify each converted pose and RGB frame against its exact upstream file."""
+    raw_root = raw_root.resolve()
+    if not raw_root.is_dir():
+        raise FileNotFoundError(f"Original TartanAir source root does not exist: {raw_root}")
+    source_files: dict[str, Path] = {}
+    for descriptor in descriptors:
+        spec = json.loads(descriptor.read_text(encoding="utf-8"))
+        provenance = spec.get("provenance", {})
+        if provenance.get("source_layout") != "tartanair_v1":
+            raise ValueError(f"Not an attested TartanAir V1 conversion: {descriptor}")
+        relative = provenance.get("source_relative_trajectory")
+        if not isinstance(relative, str) or not relative:
+            raise ValueError(f"Missing upstream trajectory path: {descriptor}")
+        relative_path = Path(relative)
+        if relative_path.is_absolute() or ".." in relative_path.parts:
+            raise ValueError(f"Unsafe upstream trajectory path: {relative}")
+        trajectory = (raw_root / relative_path).resolve()
+        if not trajectory.is_relative_to(raw_root):
+            raise ValueError(f"Upstream trajectory escapes source root: {relative}")
+
+        pose_file = trajectory / "pose_left.txt"
+        if not pose_file.is_file() or not pose_file.resolve().is_relative_to(raw_root):
+            raise FileNotFoundError(f"Original TartanAir pose file missing: {pose_file}")
+        poses = np.loadtxt(pose_file, dtype=float)
+        if poses.ndim == 1:
+            poses = poses.reshape(1, -1)
+        expected_poses = np.column_stack(
+            [np.asarray(spec["positions"]), np.asarray(spec["quaternions_xyzw"])]
+        )
+        if not np.array_equal(poses, expected_poses):
+            raise ValueError(f"Original TartanAir poses changed after conversion: {relative}")
+        source_files[pose_file.relative_to(raw_root).as_posix()] = pose_file
+
+        for frame in spec["frames"]:
+            frame_path = Path(str(frame["file"]))
+            if len(frame_path.parts) != 2 or frame_path.parts[0] != "frames":
+                raise ValueError(f"Unexpected converted frame path: {frame_path}")
+            source = trajectory / "image_left" / frame_path.name
+            if not source.is_file() or not source.resolve().is_relative_to(raw_root):
+                raise FileNotFoundError(f"Original TartanAir RGB file missing: {source}")
+            converted = descriptor.parent / frame_path
+            if _sha256_file(source) != _sha256_file(converted):
+                raise ValueError(f"Original TartanAir RGB bytes differ: {source}")
+            source_files[source.relative_to(raw_root).as_posix()] = source
+
+    return "".join(
+        f"{_sha256_file(path)}  {relative}\n"
+        for relative, path in sorted(source_files.items())
+    )
 
 def _materialize_frame(source: Path, target: Path, mode: str) -> None:
     if mode == "copy":
