@@ -257,7 +257,7 @@ def _run_orb_slam3(
     state_path: Path,
     state: dict[str, Any],
 ) -> None:
-    _verify_frozen_files(paths["converted_root"], paths["freeze_root"])
+    _verify_frozen_files(paths["converted_root"], paths["freeze_root"], paths["raw_root"])
     orb = config["orb_slam3"]
     template = str(orb.get("command_template", "")).strip()
     if not template:
@@ -354,22 +354,52 @@ def _run_orb_slam3(
     )
 
 
-def _verify_frozen_files(converted_root: Path, freeze_root: Path) -> None:
-    manifest_path = freeze_root / "files.sha256"
-    if not manifest_path.is_file():
-        raise FileNotFoundError(f"Frozen TartanAir manifest is missing: {manifest_path}")
-    for line_number, line in enumerate(manifest_path.read_text(encoding="utf-8").splitlines(), 1):
-        if not line.strip():
-            continue
-        try:
-            expected, relative = line.split("  ", 1)
-        except ValueError as exc:
-            raise ValueError(f"Malformed freeze manifest line {line_number}") from exc
-        path = converted_root / relative
-        if not path.is_file():
-            raise FileNotFoundError(f"Frozen TartanAir file is missing: {path}")
-        if _sha256_file(path) != expected:
-            raise ValueError(f"Frozen TartanAir file changed after freeze: {relative}")
+def _verify_frozen_files(
+    converted_root: Path, freeze_root: Path, raw_root: Path
+) -> None:
+    """Reject stale or modified converted and original source evidence."""
+    freeze_path = freeze_root / "freeze.json"
+    if not freeze_path.is_file():
+        raise FileNotFoundError(f"Frozen TartanAir metadata missing: {freeze_path}")
+    freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
+    if freeze.get("raw_source_validation") != "source_matched":
+        raise PipelineBlocked(
+            "TartanAir freeze lacks verified upstream source provenance; "
+            "create a fresh freeze using --raw-root before baseline execution"
+        )
+
+    for name, expected_key, root in (
+        ("files.sha256", "file_manifest_sha256", converted_root),
+        ("raw-files.sha256", "raw_source_manifest_sha256", raw_root),
+    ):
+        manifest_path = freeze_root / name
+        if not manifest_path.is_file():
+            raise FileNotFoundError(f"Frozen TartanAir manifest missing: {manifest_path}")
+        recorded_hash = freeze.get(expected_key)
+        if not isinstance(recorded_hash, str) or _sha256_file(manifest_path) != recorded_hash:
+            raise ValueError(f"TartanAir manifest integrity mismatch: {name}")
+        root_resolved = root.resolve()
+        for line_number, line in enumerate(
+            manifest_path.read_text(encoding="utf-8").splitlines(), 1
+        ):
+            if not line.strip():
+                continue
+            try:
+                expected, relative = line.split("  ", 1)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Malformed TartanAir manifest line {line_number}: {name}"
+                ) from exc
+            relative_path = Path(relative)
+            if relative_path.is_absolute() or ".." in relative_path.parts:
+                raise ValueError(f"Unsafe TartanAir manifest path: {relative}")
+            path = (root_resolved / relative_path).resolve()
+            if not path.is_relative_to(root_resolved):
+                raise ValueError(f"TartanAir manifest path escapes root: {relative}")
+            if not path.is_file():
+                raise FileNotFoundError(f"Frozen TartanAir file missing: {path}")
+            if _sha256_file(path) != expected:
+                raise ValueError(f"Frozen TartanAir file changed after freeze: {relative}")
 
 
 def _hardware_metadata() -> dict[str, Any]:
