@@ -118,6 +118,7 @@ def test_tartanair_identity_axis_preserves_identity_orientation(tmp_path: Path) 
     np.testing.assert_allclose(loaded.gt_positions[0], [1.0, 2.0, 3.0])
     np.testing.assert_allclose(loaded.gt_quaternions[0], [0.0, 0.0, 0.0, 1.0])
 
+
 def test_freeze_with_original_source_records_pose_and_rgb_hashes(tmp_path: Path) -> None:
     raw = tmp_path / "raw"
     poses = [
@@ -132,7 +133,7 @@ def test_freeze_with_original_source_records_pose_and_rgb_hashes(tmp_path: Path)
 
     metadata = json.loads((evidence / "freeze.json").read_text(encoding="utf-8"))
     manifest = (evidence / "raw-files.sha256").read_text(encoding="utf-8")
-    assert metadata["raw_source_validation"] == "byte_matched"
+    assert metadata["raw_source_validation"] == "source_matched"
     assert metadata["raw_source_manifest"] == "raw-files.sha256"
     assert hashlib.sha256(manifest.encode()).hexdigest() == metadata[
         "raw_source_manifest_sha256"
@@ -178,3 +179,17 @@ def test_freeze_rejects_upstream_drift_after_copy_conversion(
     with pytest.raises(ValueError, match="(RGB bytes differ|poses changed)"):
         freeze_tartanair_cohort(converted, evidence, raw_root=raw)
     assert not (evidence / "freeze.json").exists()
+
+
+def test_freeze_prevents_overwriting_previous_evidence(tmp_path: Path) -> None:
+    raw = tmp_path / "raw"
+    _write_raw_sequence(raw, [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]], [0])
+    converted = tmp_path / "converted"
+    evidence = tmp_path / "evidence"
+    convert_tartanair_v1(raw, converted, fps=10.0, link_mode="copy")
+    freeze_tartanair_cohort(converted, evidence, raw_root=raw)
+    previous = (evidence / "freeze.json").read_bytes()
+
+    with pytest.raises(FileExistsError, match="freeze already exists"):
+        freeze_tartanair_cohort(converted, evidence, raw_root=raw)
+    assert (evidence / "freeze.json").read_bytes() == previous
