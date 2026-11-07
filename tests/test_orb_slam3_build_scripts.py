@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -55,3 +56,16 @@ def test_pangolin_pin_and_compatibility_flag_are_explicit() -> None:
     assert 'status --porcelain --untracked-files=no' in source
     assert '-DCMAKE_CXX_FLAGS="-include cstdint"' in source
     assert 'pangolin-build-manifest.json' in source
+
+
+def test_standalone_baseline_pilot_cli_is_available_without_running_data() -> None:
+    script = ROOT / "tools/orb_slam3/run_development_baseline.py"
+    result = subprocess.run(
+        [sys.executable, str(script), "--help"],
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    assert "--expected-freeze-sha256" in result.stdout
+    assert "--work" in result.stdout
+    assert "--output" in result.stdout
