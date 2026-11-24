@@ -96,13 +96,20 @@ jobs:
       - name: Run smoke benchmark
         run: s4dtam-bench run configs/experiments/smoke.yaml
 
+      - name: Verify smoke artifacts exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d outputs/smoke
+          test -n "$(find outputs/smoke -type f -print -quit)"
+
       - name: Upload smoke results
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: smoke-results
           path: outputs/smoke/
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 1
 
   release-integrity:
